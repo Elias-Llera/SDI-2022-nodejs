@@ -1,4 +1,5 @@
 module.exports = function (app) {
+
     app.get("/songs", function (req, res) {
         let response = "";
 
@@ -21,9 +22,25 @@ module.exports = function (app) {
         res.send(response);
     });
 
+    app.post('/songs/add', function(req, res){
+       let response = "Cancion agregada: " + req.body.title + "<br>"
+       + " genero: " + req.body.kind + "<br>"
+       + " precio: " + req.body.price;
+
+       res.send(response);
+    });
+
     app.get('/add', function(req, res) {
         let response = parseInt(req.query.num1) + parseInt(req.query.num2);;
         res.send(String(response));
+    });
+
+    app.get('/promo*', function (req, res) {
+        res.send('Respuesta al patrón promo*');
+    });
+
+    app.get('/pro*ar', function (req, res) {
+        res.send('Respuesta al patrón pro*ar');
     });
 
 };
