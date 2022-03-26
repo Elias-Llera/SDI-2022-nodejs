@@ -1,0 +1,21 @@
+{% extends "layout.twig" %}
+
+{% block title %} Autores – uoMusic {% endblock %}
+
+{% block main_container %}
+
+    <h2>Autores</h2>
+
+    <div class="row">
+        {% for author in authors %}
+            <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
+                <div style="width:200px">
+                    <div>{{ author.name }} </div>
+                    <div>{{ author.group }} </div>
+                    <div>{{ author.rol }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
