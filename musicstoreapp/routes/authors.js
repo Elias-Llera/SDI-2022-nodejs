@@ -1,4 +1,4 @@
-module.exports = function (app) {
+module.exports = function (app, MongoClient) {
 
     app.get("/authors", function (req, res) {
         let authors = [{
@@ -26,24 +26,24 @@ module.exports = function (app) {
         let response = 'Autor:';
 
         response += ' Nombre: '
-        if(req.body.name != null && typeof req.body.name != undefined && req.body.name.trim().length !=0){
-            response += req.body.name;
-        } else {
+        if(typeof req.body.name === undefined ||req.body.name === null || req.body.name.toString().trim().length == 0){
             response += 'No enviado en la petición';
+        } else {
+            response += req.body.name;
         }
 
         response += ' Grupo: '
-        if(req.body.group != null && typeof req.body.group != undefined && req.body.group.trim().length !=0){
-            response += req.body.group;
-        } else {
+        if(typeof req.body.group === undefined || req.body.group === null || req.body.group.toString().trim().length ==0){
             response += 'No enviado en la petición';
+        } else {
+            response += req.body.group;
         }
 
         response += ' Rol: '
-        if(req.body.rol != null && typeof req.body.rol != undefined && req.body.rol.trim().length !=0){
-            response += req.body.rol;
-        } else {
+        if(typeof req.body.rol != undefined || req.body.rol == null || req.body.rol.toString().trim().length ==0){
             response += 'No enviado en la petición';
+        } else {
+            response += req.body.rol;
         }
 
         res.send(response);
