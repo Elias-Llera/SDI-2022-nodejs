@@ -6,22 +6,35 @@ let logger = require('morgan');
 
 let app = express();
 
-// Componente para subir archivos
+// Modulo login
+let expressSession = require('express-session');
+app.use(expressSession({
+  secret: 'abcdefg',
+  resave: true,
+  saveUninitialized: true
+}));
+
+//Modulo encriptar
+let crypto = require('crypto');
+
+// Modulo para subir archivos
 let fileUpload = require('express-fileupload');
 app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
   createParentPath: true
 }));
-app.set('uploadPath', __dirname)
 
-// Componente para leer peticiones posts
+app.set('uploadPath', __dirname)
+app.set('clave','abcdefg');
+app.set('crypto', crypto);
+
+// Módulo para leer cuerpo de peticiones posts
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Obtener rutas basicas del proyecto
+// Obtener ruta index
 let indexRouter = require('./routes/index');
-let usersRouter = require('./routes/users');
 
 // Cliente mongo
 const { MongoClient } = require("mongodb");
@@ -31,33 +44,35 @@ app.set('connectionStrings', url);
 // Repositorios
 let songsRepository = require("./repositories/songsRepository.js");
 songsRepository.init(app, MongoClient);
+const usersRepository = require("./repositories/usersRepository.js");
+usersRepository.init(app, MongoClient);
 
 // Rutas
 require("./routes/songs.js")(app, songsRepository);
 require("./routes/authors.js")(app, MongoClient);
+require("./routes/users.js")(app, usersRepository);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'twig');
 
-// Loger
+// Logger
 app.use(logger('dev'));
 
 // Usamos json para las respuestas
 app.use(express.json());
 
-// Codificacion de urls
+// Codification de urls
 app.use(express.urlencoded({ extended: false }));
 
 // Uso de cookies
 app.use(cookieParser());
 
-// Directorio publico del proyecto
+// Directorio público del proyecto
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Usar rutas basicas del proyecto
+// Usar rutas index
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
