@@ -1,5 +1,6 @@
 const {ObjectId} = require("mongodb");
-module.exports = function (app, songsRepository) {
+const commentsRepository = require("../repositories/commentsRepository");
+module.exports = function (app, songsRepository, commentsRepository) {
 
     app.get("/songs", function (req, res) {
         let songs = [{
@@ -68,7 +69,7 @@ module.exports = function (app, songsRepository) {
         songsRepository.findSong(filter, {}).then(song=>{
             res.render("songs/edit.twig", {song:song});
         }).catch(error=> {
-            res.send("Se ha producido un error al recuperar la cancion " + error);
+            res.send("Se ha producido un error al recuperar la canción " + error);
         });
     });
 
@@ -145,14 +146,23 @@ module.exports = function (app, songsRepository) {
        });
     });
 
+
     app.get('/songs/:id', function (req, res) {
-        let filter = {_id: ObjectId(req.params.id)};
+        let songId = ObjectId(req.params.id);
+        let songFilter = {_id: songId};
+        let commentsFilter = {song_id : songId};
         let options = {};
-        songsRepository.findSong(filter, options).then(song => {
-            res.render("songs/song.twig", {song: song});
-        }).catch(error => {
-            res.send("Se ha producido un error al buscar la canción " + error)
-        });
+
+        songsRepository
+            .findSong(songFilter, options)
+            .then(song =>
+                commentsRepository
+                    .getComments(commentsFilter, options)
+                    .then(comments =>
+                        res.render("songs/song.twig", {song: song, comments: comments})))
+            .catch(error => {
+                res.send("Se ha producido un error al buscar la canción " + error);
+            });
     });
 
     app.get('/songs/:kind/:id', function(req, res) {

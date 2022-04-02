@@ -3,6 +3,7 @@
 {% block title %} Detalles de canción {% endblock %}
 
 {% block main_container %}
+
 	 <div class="row">
 		<div class="media col-xs-10">
 		  <div class="media-left media-middle">
@@ -17,5 +18,38 @@
 		  </div>
 		</div>
 	 </div>
+
+
+	<h2>Añadir comentario</h2>
+
+	<form class="form-horizontal" method="post" action="/comments/add/{{ song._id }}" enctype="multipart/form-data">
+
+		<div class="form-group">
+			<label class="control-label col-sm-2" for="text">Comentario:</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="text" name="text"
+					   placeholder="Tu comentario" required/>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" class="btn btn-primary">Enviar comentario</button>
+			</div>
+		</div>
+
+	</form>
+
+
+	<h2>Comentarios</h2>
+
+	{% for comment in comments %}
+	<div class="card">
+		<div class="card-body" >
+			<h4 class="card-title"> {{ comment.author }} </h4>
+			<p class="card-text text-muted"> {{ comment.text }} </p>
+		</div>
+	</div>
+	{% endfor %}
 
 {% endblock %}
