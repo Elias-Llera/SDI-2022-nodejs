@@ -48,17 +48,19 @@ const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
 let commentsRepository = require("./repositories/commentsRepository.js");
 commentsRepository.init(app, MongoClient);
+const {mongoClient} = require("./repositories/songsRepository");
 
 // Control de authentication
 const userSessionRouter = require('./routes/userSessionRouter');
 const userAudiosRouter = require('./routes/userAudiosRouter');
 const userAuthorRouter = require("./routes/userAuthorRouter");
-const {mongoClient} = require("./repositories/songsRepository");
-app.use("/songs/add",userSessionRouter);
-app.use("/publications",userSessionRouter);
-app.use("/audios/",userAudiosRouter);
 app.use("/shop/",userSessionRouter);
+app.use("/songs/add",userSessionRouter);
+app.use("/songs/buy",userSessionRouter);
+app.use("/purchases",userSessionRouter);
+app.use("/publications",userSessionRouter);
 app.use("/comments", userSessionRouter);
+app.use("/audios/",userAudiosRouter);
 app.use("/songs/edit",userAuthorRouter);
 app.use("/songs/delete",userAuthorRouter);
 
