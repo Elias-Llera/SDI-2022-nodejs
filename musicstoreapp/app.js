@@ -6,6 +6,10 @@ let logger = require('morgan');
 
 let app = express();
 
+// Modulo token
+let jwt = require('jsonwebtoken');
+app.set('jwt', jwt);
+
 // Modulo login
 let expressSession = require('express-session');
 app.use(expressSession({
@@ -16,6 +20,8 @@ app.use(expressSession({
 
 //Modulo encriptar
 let crypto = require('crypto');
+app.set('clave','abcdefg');
+app.set('crypto', crypto);
 
 // Modulo para subir archivos
 let fileUpload = require('express-fileupload');
@@ -23,10 +29,7 @@ app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
   createParentPath: true
 }));
-
 app.set('uploadPath', __dirname)
-app.set('clave','abcdefg');
-app.set('crypto', crypto);
 
 // Módulo para leer cuerpo de peticiones posts
 let bodyParser = require('body-parser');
@@ -52,20 +55,22 @@ const {mongoClient} = require("./repositories/songsRepository");
 
 // Control de authentication
 const userSessionRouter = require('./routes/userSessionRouter');
-const userAudiosRouter = require('./routes/userAudiosRouter');
-const userAuthorRouter = require("./routes/userAuthorRouter");
 app.use("/shop/",userSessionRouter);
 app.use("/songs/add",userSessionRouter);
 app.use("/songs/buy",userSessionRouter);
 app.use("/purchases",userSessionRouter);
 app.use("/publications",userSessionRouter);
 app.use("/comments", userSessionRouter);
+const userAudiosRouter = require('./routes/userAudiosRouter');
 app.use("/audios/",userAudiosRouter);
+const userAuthorRouter = require("./routes/userAuthorRouter");
 app.use("/songs/edit",userAuthorRouter);
 app.use("/songs/delete",userAuthorRouter);
+const userTokenRouter = require('./routes/api/userTokenRouter');
+app.use("/api/v1.0/songs/", userTokenRouter);
 
 // Rutas
-require("./routes/api/songAPIv1.0.js")(app, songsRepository);
+require("./routes/api/songAPIv1.0.js")(app, songsRepository, usersRepository);
 require("./routes/songs.js")(app, songsRepository, commentsRepository);
 require("./routes/authors.js")(app, MongoClient);
 require("./routes/users.js")(app, usersRepository);

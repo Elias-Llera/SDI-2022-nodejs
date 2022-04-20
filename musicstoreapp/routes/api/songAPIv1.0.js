@@ -1,6 +1,6 @@
 const {ObjectId} = require("mongodb");
 
-module.exports = function (app, songsRepository) {
+module.exports = function (app, songsRepository, usersRepository) {
 
     app.get("/api/v1.0/songs", function (req, res) {
         let filter = {};
@@ -96,7 +96,7 @@ module.exports = function (app, songsRepository) {
 
             let song = {
                 author: req.session.user
-            }
+            };
             if (typeof req.body.title != "undefined" && req.body.title != null)
                 song.title = req.body.title;
             if (typeof req.body.kind != "undefined" && req.body.kind != null)
@@ -119,7 +119,7 @@ module.exports = function (app, songsRepository) {
                     res.json({
                         message: "Canción modificada correctamente.",
                         result: result
-                    })
+                    });
                 }
             }).catch(error => {
                 res.status(500);
@@ -127,7 +127,50 @@ module.exports = function (app, songsRepository) {
             });
         } catch (e) {
             res.status(500);
-            res.json({error: "Se ha producido un error al intentar modificar la canción: "+ e})
+            res.json({error: "Se ha producido un error al intentar modificar la canción: "+ e});
+        }
+    });
+
+    app.post('/api/v1.0/users/login', function (req, res){
+        try {
+            let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
+                .update(req.body.password).digest('hex');
+            let filter = {
+                email: req.body.email,
+                password: securePassword
+            };
+            let options = {};
+            usersRepository.findUser(filter, options).then(user => {
+                if (user == null) {
+                    res.status(401);
+                    res.json({
+                        message:"Usuario no autorizado",
+                        authenticated: false
+                    })
+                } else {
+                    let token = app.get('jwt').sign(
+                        {user:user.email, time:Date.now()/1000},
+                        "secreto");
+                    res.status(200); //Correct
+                    res.json({
+                        message:"Usuario autorizado",
+                        authenticated: true,
+                        token: token
+                    });
+                }
+            }).catch(error => {
+                res.status(401);
+                res.json({
+                    message:"Se ha producido un error al verificar las credenciales",
+                    authenticated: false
+                });
+            });
+        } catch (e) {
+            res.status(500);
+            res.json({
+                message:"Se ha producido un error al verificar las credenciales",
+                authenticated: false
+            });
         }
     });
 }
