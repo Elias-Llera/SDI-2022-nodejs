@@ -146,7 +146,7 @@ module.exports = function (app, songsRepository, commentsRepository) {
                             }
                         })
                 }
-            });
+            }).catch(functionCallback(false));
     }
 
     app.get('/songs/buy/:id', function (req, res) {

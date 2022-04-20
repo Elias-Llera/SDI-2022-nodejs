@@ -65,6 +65,7 @@ app.use("/songs/edit",userAuthorRouter);
 app.use("/songs/delete",userAuthorRouter);
 
 // Rutas
+require("./routes/api/songAPIv1.0.js")(app, songsRepository);
 require("./routes/songs.js")(app, songsRepository, commentsRepository);
 require("./routes/authors.js")(app, MongoClient);
 require("./routes/users.js")(app, usersRepository);
