@@ -16,6 +16,10 @@ app.use(function(req, res, next) {
   next();
 });
 
+// Modulo peticiones
+let rest = require('request');
+app.set('rest', rest);
+
 // Modulo token
 let jwt = require('jsonwebtoken');
 app.set('jwt', jwt);
